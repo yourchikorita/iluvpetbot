@@ -12,7 +12,7 @@ import requests
 
 def pet_pharm_api(userLoc):
     '''
-    동물약국 api 불러오기
+    동물약국 api 불러오기.
     userLoc : userLocation (도봉구)
     '''
     serviceKey='587a69416c736565313032584762564d'
