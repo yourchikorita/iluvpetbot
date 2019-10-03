@@ -33,7 +33,7 @@ def write_user_choice_num(user_choice_num):
     db.save(EXCEL_FILE_NAME)
     print('엑셀파일에 저장되었따 유저가 선택한 번호가   ')
     
-def write_with_index_all(user_festival_list):
+def write_userLocList(user_festival_list):
 
     tuto_db['A3'].value = user_festival_list
     db.save(EXCEL_FILE_NAME)
@@ -70,13 +70,18 @@ def send_message(chat_id, text='bla-bla-bla'):
     
     if  text[:5] == "지역검색!":
         user_loc=text[5:] # ex)노원구 
-        print('------------사용자가 지역검색을했다.---------------',user_loc)
+        print('------------사용자가 지역검색-------:',user_loc)
         pharm_show_list_str,userLocList =  pet_pharm_api(user_loc) #함수호출
-        write_with_index_all(userLocList)#엑셀에 작성하는 코드 A3에 저장  
-        result='번호 하나 선택 바람 입력방식=[번호+번] 예)3번' +'\n'+'\n'+read_with_index('A3')       
+        write_userLocList(userLocList)#엑셀에 작성하는 코드 A3에 저장  
+        result=user_loc+'에 있는 동물약국 목록 입니다. 번호 하나 선택 바람 입력방식=[번호] 예)3' +'\n'+'\n'+read_with_index('A3')       
         params = {'chat_id':chat_id, 'text': result}
         requests.post(url, json=params)
         
+    elif text[:4]=='길찾기!':
+        num=text[4:]
+        print('번호 눌렀냐')
+        params = {'chat_id':chat_id, 'text': num+'선택하였군'}
+        requests.post(url, json=params)
     elif text=="동물약국":
         params = {'chat_id':chat_id, 'text': '검색을 원하는 지역을 말해줘! 입력방식=[지역검색!+검색을 원하는 지역구] 예)지역검색!노원구'}
         requests.post(url, json=params)
