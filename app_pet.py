@@ -80,7 +80,7 @@ def read_with_sm_pet_hospital(user_pick_name='차오름동물병원'):
       
     #선택한 병원 디테일정보
     detail_info=''
-    detail_line=''
+
     for item in all_values:
         if user_pick_name in item[0]: 
             #detail_line=all_values[0][0]+':'+item[0]+'\n'+all_values[0][1]+':'+item[1]+'\n'+all_values[0][2]+':'+item[2]
