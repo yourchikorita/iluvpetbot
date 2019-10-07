@@ -119,9 +119,12 @@ def send_message(chat_id, text='bla-bla-bla'):
     url = 'https://api.telegram.org/bot{token}/sendMessage'.format(token=API_KEY)   #sendMessage
     keyboard = {                                        # Keyboard 형식
             'keyboard':[[{
-                    'text': '동물약국'
+                    'text': '동물약국 찾기'
                         },
-                    {'text': '소동물병원'
+                    {'text': '소동물병원 찾기'
+                        }],[
+                                
+                    {'text': '반려견 안전관리 및 과태료'
                         }]
                     ],
             'one_time_keyboard' : True
@@ -138,10 +141,19 @@ def send_message(chat_id, text='bla-bla-bla'):
         result=user_loc+'에 있는 동물약국 목록 입니다!!! 번호 하나 선택 바람 입력방식=[더보기!+번호] 예)더보기!3번' +'\n'+'\n'+read_title_A3      
         params = {'chat_id':chat_id, 'text': result}
         requests.post(url, json=params)
-    elif text == '소동물병원':
+    elif text == '소동물병원 찾기':
          detail_info,sm_hospital_total_list = read_with_sm_pet_hospital()
          params = {'chat_id':chat_id, 'text': '서울특별시 소동물병원 리스트 입니다. 상세정보를 원하시는 병원명을 입력하세요.\n'+sm_hospital_total_list}
          requests.post(url, json=params)
+    elif text == '반려견 안전관리 및 과태료':     
+         safe_rule = tuto_db['A20':'A42']
+         safe_fine=''
+         for row in safe_rule:
+                for cell in row:
+                    safe_fine=safe_fine+str(cell.value)+'\n'
+         safe_fine_str=str(safe_fine)           
+         params = {'chat_id':chat_id, 'text': safe_fine_str}
+         requests.post(url, json=params)     
          
     elif text[-2:]=='병원':
          user_hopital_name=text #병원이름 들어감
@@ -169,7 +181,7 @@ def send_message(chat_id, text='bla-bla-bla'):
         final_addr=sep_slash[0]
         send_message_map_url(chat_id,text=final_addr) 
         
-    elif text=="동물약국":
+    elif text=="동물약국 찾기":
         params = {'chat_id':chat_id, 'text': '검색을 원하는 지역을 말해줘! 입력방식=[지역검색!+검색을 원하는 지역구] 예)지역검색!노원구'}
         requests.post(url, json=params)
         
