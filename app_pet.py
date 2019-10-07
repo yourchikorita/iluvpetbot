@@ -16,9 +16,11 @@ EXCEL_FILE_NAME = 'Database.xlsx'
 db = load_workbook(filename=EXCEL_FILE_NAME)
 tuto_db = db['fv']
 
-API_KEY = '945893375:AAGVtE_bJIrqe9HGJ-mz0qzPQZBaP4o7oiY'
+API_KEY = '916473331:AAHDtuAaRcGM8FlPRFUYDGRzY6mgyDWacuo'
 
 app = Flask(__name__)
+
+
 
 
 def write_with_index(userLocList):
@@ -53,10 +55,49 @@ def write_detail_list(user_festival_list):
     #print('엑셀파일에 저장!유저가 지역 선택한 약국리스트 데이타가!')
     print('엑셀파일에 A4저장됨!')    
     
+    
 def read_with_index(loc):
     read_result = tuto_db[loc].value
     print('엑셀을 읽어들어옴!')
     return read_result
+
+def read_with_sm_pet_hospital(user_pick_name='차오름동물병원'):
+    sm_pet=load_workbook(filename="small_pet_database.xlsx", data_only=True)
+    sm_db=sm_pet['Sheet1']
+    all_values = []
+    for row in sm_db.rows:
+        row_value = []
+        for cell in row:
+            row_value.append(cell.value)
+        all_values.append(row_value)
+    
+    #서울특별시내 소동물병원 목록.
+    sm_title_list=''
+    for item in all_values[1:]:
+      i=1
+      sm_title_list=sm_title_list+item[i-1] +' ('+item[i]+')'+'\n'
+      i=i+1
+      
+    #선택한 병원 디테일정보
+    detail_info=''
+    detail_line=''
+    for item in all_values:
+        if user_pick_name in item[0]: 
+            #detail_line=all_values[0][0]+':'+item[0]+'\n'+all_values[0][1]+':'+item[1]+'\n'+all_values[0][2]+':'+item[2]
+            #print(detail_line)
+            detail_info=detail_info+str(item)
+            detail_info_list=detail_info.split(',')
+            
+            name=all_values[0][0]+'-'+detail_info_list[0][1:]+'\n'
+            gu=all_values[0][1]+'-'+detail_info_list[1]+'\n'
+            time=all_values[0][2]+'-'+detail_info_list[2]+'\n'
+            time_weekend=all_values[0][3]+'-'+detail_info_list[3]+'\n'
+            tel=all_values[0][4]+'-'+detail_info_list[4]+'\n'
+            addr=all_values[0][5]+'-'+detail_info_list[5]+'\n'
+            ref=all_values[0][6]+detail_info_list[6][:-2]
+            result = name+gu+time+time_weekend+tel+addr+ref
+            
+    return result,sm_title_list
     
 def parse_message(data):
     chat_id = data['message']['chat']['id']
@@ -80,7 +121,7 @@ def send_message(chat_id, text='bla-bla-bla'):
             'keyboard':[[{
                     'text': '동물약국'
                         },
-                    {'text': '동물병원'
+                    {'text': '소동물병원'
                         }]
                     ],
             'one_time_keyboard' : True
@@ -94,11 +135,19 @@ def send_message(chat_id, text='bla-bla-bla'):
         write_title_list(userTitle)#엑셀에 작성하는 코드 A3에 타이틀리스트 저장  
         write_detail_list(userLocList)#엑셀에 작성하는 코드 A4에 디테일리스트 저장  
         read_title_A3=read_with_index('A3')
-        result=user_loc+'에 있는 동물약국 목록 입니다!!! 번호 하나 선택 바람 입력방식=[더보기!+번호] 예)길찾기!3번' +'\n'+'\n'+read_title_A3      
+        result=user_loc+'에 있는 동물약국 목록 입니다!!! 번호 하나 선택 바람 입력방식=[더보기!+번호] 예)더보기!3번' +'\n'+'\n'+read_title_A3      
         params = {'chat_id':chat_id, 'text': result}
         requests.post(url, json=params)
-       
-        
+    elif text == '소동물병원':
+         detail_info,sm_hospital_total_list = read_with_sm_pet_hospital()
+         params = {'chat_id':chat_id, 'text': '서울특별시 소동물병원 리스트 입니다. 상세정보를 원하시는 병원명을 입력하세요.\n'+sm_hospital_total_list}
+         requests.post(url, json=params)
+         
+    elif text[-2:]=='병원':
+         user_hopital_name=text #병원이름 들어감
+         detail_info,sm_hospital_total_list=read_with_sm_pet_hospital(user_hopital_name)
+         params = {'chat_id':chat_id, 'text': detail_info}
+         requests.post(url, json=params)
     elif text[:4]=='더보기!':
         num=text[4:]# 예)2번
   
@@ -125,7 +174,7 @@ def send_message(chat_id, text='bla-bla-bla'):
         requests.post(url, json=params)
         
     elif text=='아니요':
-       
+        
         params = {'chat_id':chat_id, 'text': '아니라니...대화가 종료되었다네... 날 다시 부르려면 [나와라]라고 입력하시오..'}
         requests.post(url, json=params)
     else:
