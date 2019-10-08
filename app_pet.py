@@ -11,13 +11,15 @@ import requests
 from flask import Flask, request, Response
 from pet_pharmacy import pet_pharm_api
 from openpyxl import load_workbook
+import os
+
 
 EXCEL_FILE_NAME = 'Database.xlsx'
 db = load_workbook(filename=EXCEL_FILE_NAME)
 tuto_db = db['fv']
 
-API_KEY = '916473331:AAHDtuAaRcGM8FlPRFUYDGRzY6mgyDWacuo'
-
+#API_KEY = '916473331:AAHDtuAaRcGM8FlPRFUYDGRzY6mgyDWacuo' #gonnabe
+API_KEY = '764462849:AAER9m2z9X4jRkQ4SYycPUo91o16fXxIzhk' #iluvpet
 app = Flask(__name__)
 
 
@@ -96,13 +98,31 @@ def read_with_sm_pet_hospital(user_pick_name='차오름동물병원'):
             addr=all_values[0][5]+'-'+detail_info_list[5]+'\n'
             ref=all_values[0][6]+detail_info_list[6][:-2]
             result = name+gu+time+time_weekend+tel+addr+ref
-            
-    return result,sm_title_list
+            little_list=sm_title_list[:122]
+    return result,sm_title_list,little_list
     
+#def parse_message(data):
+#    chat_id = data['message']['chat']['id']
+#    msg = data['message']['text']
+#    return chat_id, msg
+
 def parse_message(data):
+    '''응답data 로부터 chat_id 와 text, user_name을 추출.'''
+    chat_id = None
+    msg = None
+    user_name = None
+    inline_data = None    
+    
+    if 'callback_query' in data:
+        data=data['callback_query']
+        inline_data = data['data']
+        
     chat_id = data['message']['chat']['id']
     msg = data['message']['text']
-    return chat_id, msg
+    user_name = data['message']['chat']['first_name'] + data['message']['chat']['last_name']
+    print('parse_message안에서 inline data==',inline_data)
+    return chat_id, msg, user_name, inline_data    #https://core.telegram.org/bots/api#keyboardbutton
+
 
 def pick_list_back(pick_list):
     return pick_list
@@ -113,8 +133,17 @@ def send_message_map_url(chat_id,text):
     google_map_user_url=(google_map_url+text).replace(" ","")
     params = {'chat_id':chat_id, 'text':google_map_user_url}
     requests.post(url, json=params)
+
+def send_message_inlinekeyboard(chat_id, text):
+    url = 'https://api.telegram.org/bot{token}/sendMessage'.format(token=API_KEY)  
+    InlineKeyboard = {'inline_keyboard' : [[{'text':'전체보기', 'callback_data':'ALLVIEW'}]
+                                                                                    ]}
+
+    params = {'chat_id':chat_id, 'text' : '전체 목록  하단 버튼을 클릭하세요' , 'reply_markup':InlineKeyboard}
+    requests.post(url,json=params)
+
        
-def send_message(chat_id, text='bla-bla-bla'):
+def send_message(chat_id, text='bla-bla-bla', user_name='noone', inline_data='hi'):
 
     url = 'https://api.telegram.org/bot{token}/sendMessage'.format(token=API_KEY)   #sendMessage
     keyboard = {                                        # Keyboard 형식
@@ -142,9 +171,18 @@ def send_message(chat_id, text='bla-bla-bla'):
         params = {'chat_id':chat_id, 'text': result}
         requests.post(url, json=params)
     elif text == '소동물병원 찾기':
-         detail_info,sm_hospital_total_list = read_with_sm_pet_hospital()
-         params = {'chat_id':chat_id, 'text': '서울특별시 소동물병원 리스트 입니다. 상세정보를 원하시는 병원명을 입력하세요.\n'+sm_hospital_total_list}
+         detail_info,sm_hospital_total_list,little_list = read_with_sm_pet_hospital()
+         params = {'chat_id':chat_id, 'text': '서울특별시 소동물병원 리스트 입니다. 상세정보를 원하시는 병원명을 입력하세요.\n'+little_list}
          requests.post(url, json=params)
+         send_message_inlinekeyboard(chat_id, text)
+         
+    elif inline_data=='ALLVIEW':
+         detail_info,sm_hospital_total_list,little_list = read_with_sm_pet_hospital()
+         params = {'chat_id':chat_id, 'text': '서울특별시 소동물병원 리스트 입니다. 상세정보를 원하시는 병원명을 입력하세요.\n'+sm_hospital_total_list}  
+         requests.post(url, json=params)
+    
+    
+        
     elif text == '반려견 안전관리 및 과태료':     
          safe_rule = tuto_db['A20':'A42']
          safe_fine=''
@@ -157,7 +195,7 @@ def send_message(chat_id, text='bla-bla-bla'):
          
     elif text[-2:]=='병원':
          user_hopital_name=text #병원이름 들어감
-         detail_info,sm_hospital_total_list=read_with_sm_pet_hospital(user_hopital_name)
+         detail_info,sm_hospital_total_list,little_list=read_with_sm_pet_hospital(user_hopital_name)
          params = {'chat_id':chat_id, 'text': detail_info}
          requests.post(url, json=params)
     elif text[:4]=='더보기!':
@@ -203,13 +241,18 @@ def send_message(chat_id, text='bla-bla-bla'):
 def index():
     if request.method == 'POST':
         message = request.get_json()           
-        chat_id, msg = parse_message(message)
-        send_message(chat_id, msg)
+        chat_id, msg, user_name, inline_data = parse_message(message)
+        send_message(chat_id, msg, user_name, inline_data)
+        
+       
+            
         return Response('ok', status=200)
     else:
         return 'Hello World!'
 
 
+    
 
 if __name__ == '__main__':
-    app.run(port = 5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
