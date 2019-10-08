@@ -14,12 +14,11 @@ def pet_pharm_api(userLoc):
     userLoc : userLocation (도봉구)
     '''
     serviceKey='587a69416c736565313032584762564d'
-    endpoint ='http://openapi.seoul.go.kr:8088/{}/json/animalPharmacyInfo/1/25'.format(serviceKey)
+    endpoint ='http://openapi.seoul.go.kr:8088/{}/json/animalPharmacyInfo/1/800'.format(serviceKey)
     resp=requests.get(endpoint)
-    #print(resp.status_code)
     data = resp.json()
     pharm_data=data['animalPharmacyInfo']['row']
-    #print(pharm_data)
+
     
     #str 로 출력해줄 리스트 만든다.
     i=1
@@ -51,9 +50,7 @@ def pet_pharm_api(userLoc):
             userTitle=userTitle+'{}'.format(i)+'번 '+item+'\n'
             i=i+1
    
-    print('함수가 호출됨!')
-    #print(userTitle,'===========userTitle')
-    #print(userLocList,'==userLocList~~~~~~~~~~~~`')
+
     return userTitle,userLocList
     
 #pet_pharm_api('노원구')

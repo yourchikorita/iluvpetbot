@@ -2,10 +2,10 @@ from urllib.request import Request, urlopen
 
 ## https://core.telegram.org/bots/api#getupdates
 
-API_KEY = '764462849:AAER9m2z9X4jRkQ4SYycPUo91o16fXxIzhk'  #iluvpet
-WEBHOOK_URL = 'https://iluvpet.herokuapp.com'# iluvpet
-#API_KEY = '916473331:AAHDtuAaRcGM8FlPRFUYDGRzY6mgyDWacuo' #gonnabeok
-#WEBHOOK_URL = 'https://d6ed15e7.ap.ngrok.io'
+#API_KEY = '764462849:AAER9m2z9X4jRkQ4SYycPUo91o16fXxIzhk'  #iluvpet
+#WEBHOOK_URL = 'https://iluvpet.herokuapp.com'# iluvpet
+API_KEY = '916473331:AAHDtuAaRcGM8FlPRFUYDGRzY6mgyDWacuo' #gonnabeok
+WEBHOOK_URL = 'https://5faf7d88.ap.ngrok.io'
 BOT_INFO_URL = 'https://api.telegram.org/bot{API_KEY}/getMe'.format(API_KEY=API_KEY)
 BOT_UPDATE_URL = 'https://api.telegram.org/bot{API_KEY}/getUpdates?offset=1'.format(API_KEY=API_KEY)
 BOT_SET_WEBHOOK_URL = 'https://api.telegram.org/bot{API_KEY}/setWebhook?url={WEBHOOK_URL}'\
@@ -63,8 +63,9 @@ def get_webhook_info():
     
     
 #bot_set_webhook_call()
-bot_set_webhook_call()
-
+#delete_webhook()
+#bot_set_webhook_call()
+#bot_update_call()
 
 #이전데이타 지우는법
 #1.delete하고
