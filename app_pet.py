@@ -25,14 +25,26 @@ def write_title_list(userTitle):
     tuto_db['A3'].value = userTitle
     db.save(EXCEL_FILE_NAME)
     
-def write_detail_list(user_festival_list):
-    tuto_db['A4'].value = user_festival_list
+def write_detail_list(userLocList):
+    tuto_db['A4'].value = userLocList
     db.save(EXCEL_FILE_NAME)
  
 def read_with_index(loc):
     read_result = tuto_db[loc].value
     return read_result
 
+def read_with_index_faq():
+    load_wb = load_workbook("Database.xlsx", data_only=True)
+    fv_sheet = load_wb['fv']  
+    return fv_sheet
+
+def faq_answer(get_cells):
+    answer=''
+    for row in get_cells:
+        for cell in row:
+            answer=answer+cell.value+'\n'           
+    return answer
+    
 def read_with_sm_pet_hospital(user_pick_name='차오름동물병원'):
     sm_pet=load_workbook(filename="small_pet_database.xlsx", data_only=True)
     sm_db=sm_pet['Sheet1']
@@ -113,12 +125,35 @@ def send_message(chat_id, text='bla-bla-bla', user_name='noone', inline_data='hi
                     {'text': '소동물병원 찾기'
                         }],[
                                 
-                    {'text': '반려견 안전관리 및 과태료'
+                    {'text': '과태료 정보'
+                        },{'text': 'FAQ'
                         }]
                     ],
             'one_time_keyboard' : True
             }
-    
+    keyboard_FAQ = {                                      
+            'keyboard':[
+                    [{
+                    'text': '동물등록방법'
+                        }],
+                    [{
+                    'text': '반려동물을 잃어버렸어요.'
+                        }],
+                    [{
+                    'text': '길잃은 동물을 봤어요.'
+                        }],
+                [{
+                    'text': '로드킬 신고는 어디에 하나요?'
+                        }],
+                [{
+                    'text': '동물사체처리는 어떻게 하나요?'
+                        }],
+                [{
+                    'text': '처음화면 가기'
+                        }]
+                    ],
+            'one_time_keyboard' : True
+            }
     if  text[:5] == "지역검색!":
         user_loc=text[5:] # ex)노원구 
         print('------------사용자가 지역검색-------:',user_loc)
@@ -131,7 +166,39 @@ def send_message(chat_id, text='bla-bla-bla', user_name='noone', inline_data='hi
         params = {'chat_id':chat_id, 'text': result}
         requests.post(url, json=params)
         send_message_inlinekeyboard_pharmacy(chat_id, text)
-        
+    elif text=='FAQ':
+         params = {'chat_id':chat_id, 'text': '동물관련 FAQ입니다. 궁금하신 사항을 선택해주세요.', 'reply_markup' : keyboard_FAQ}
+         requests.post(url, json=params)
+    elif text== '동물등록방법':
+         fv_sheet=read_with_index_faq()         
+         get_cells = fv_sheet['A50':'A56']
+         final_answer=faq_answer(get_cells)                    
+         params = {'chat_id':chat_id, 'text':final_answer, 'reply_markup' : keyboard_FAQ}
+         requests.post(url, json=params)
+    elif text=='반려동물을 잃어버렸어요.':
+         fv_sheet=read_with_index_faq()         
+         get_cells = fv_sheet['B50':'B52']
+         final_answer=faq_answer(get_cells)                    
+         params = {'chat_id':chat_id, 'text':final_answer, 'reply_markup' : keyboard_FAQ}
+         requests.post(url, json=params)
+    elif text=='길잃은 동물을 봤어요.':
+         fv_sheet=read_with_index_faq()         
+         get_cells = fv_sheet['C50':'C51']
+         final_answer=faq_answer(get_cells)                    
+         params = {'chat_id':chat_id, 'text':final_answer, 'reply_markup' : keyboard_FAQ}
+         requests.post(url, json=params)    
+    elif text=='로드킬 신고는 어디에 하나요?':
+         fv_sheet=read_with_index_faq()         
+         get_cells = fv_sheet['D50':'D51']
+         final_answer=faq_answer(get_cells)                    
+         params = {'chat_id':chat_id, 'text':final_answer, 'reply_markup' : keyboard_FAQ}
+         requests.post(url, json=params)   
+    elif text=='동물사체처리는 어떻게 하나요?':
+         fv_sheet=read_with_index_faq()         
+         get_cells = fv_sheet['E50':'E51']
+         final_answer=faq_answer(get_cells)                    
+         params = {'chat_id':chat_id, 'text':final_answer, 'reply_markup' : keyboard_FAQ}
+         requests.post(url, json=params)        
     elif text == '소동물병원 찾기':
          detail_info,sm_hospital_total_list,little_list = read_with_sm_pet_hospital()
          params = {'chat_id':chat_id, 'text': '서울특별시 소동물병원 리스트 입니다. 상세정보를 원하시는 병원명을 입력하세요. \n 예)힐스타동물병원  \n\n'+little_list} 
@@ -148,25 +215,25 @@ def send_message(chat_id, text='bla-bla-bla', user_name='noone', inline_data='hi
          params = {'chat_id':chat_id, 'text': '동물약 취급 약국 전체 리스트 입니다. 상세정보를 원하시는 약국이름을 입력하세요. 입력방식=[더보기!+약국이름] \n 예)더보기!봄약국   \n\n'+read_title_A3}  
          requests.post(url, json=params)
           
-    elif text == '반려견 안전관리 및 과태료':     
+    elif text == '과태료 정보':     
          safe_rule = tuto_db['A20':'A42']
          safe_fine=''
          for row in safe_rule:
                 for cell in row:
                     safe_fine=safe_fine+str(cell.value)+'\n'
          safe_fine_str=str(safe_fine)           
-         params = {'chat_id':chat_id, 'text': safe_fine_str}
+         params = {'chat_id':chat_id, 'text': safe_fine_str+'\n \n처음으로 돌아가시려면 "처음"을 입력해주세요.'}
          requests.post(url, json=params)     
          
     elif (text[-2:]=='병원') | (text[-2:]=='센터'):
          user_hopital_name=text #병원이름 들어감
          detail_info,sm_hospital_total_list,little_list=read_with_sm_pet_hospital(user_hopital_name)
-         params = {'chat_id':chat_id, 'text': detail_info}
+         params = {'chat_id':chat_id, 'text': detail_info+'\n \n처음화면으로 돌아가시려면 "처음"을 입력해주세요.'}
          requests.post(url, json=params)
          
     elif text[:4]=='더보기!':
-        num=text[4:]# 예)2번,병원이름으로 수정할까...
-        print('더보기에서 num===',num)
+        num=text[4:]# 예)병원이름..
+       
         #엑셀에서 엔터로 구분해서 읽으들어온다.str->list
         db_a4_str=read_with_index('A4') #A4셀에 저장해두었던 상세정보 읽어온다.
         db_a4_list=db_a4_str.split('\n')#엔터로 구분해서 list로 변환.
@@ -189,12 +256,12 @@ def send_message(chat_id, text='bla-bla-bla', user_name='noone', inline_data='hi
         params = {'chat_id':chat_id, 'text': '검색을 원하는 지역을 말씀해주세요! \n 입력방식=[지역검색!+지역구] \n 예)지역검색!노원구'}
         requests.post(url, json=params)
         
-    elif text=='처음':      
-        params = {'chat_id':chat_id, 'text': ' * 동물약국 검색은 "동물약국찾기" 버튼을 입력해주세요. \n* 햄스터,기니피그,토끼,친칠라 등 을 위한 병원은 "소동물찾기" 버튼을 이용해주세요. ', 'reply_markup' : keyboard}
+    elif (text=='처음')|(text=='처음화면 가기'):      
+        params = {'chat_id':chat_id, 'text': '안녕하세요. '+user_name+'님! '+'\n펫을 위한 모든 정보! 🐹️아이러브펫🐹️입니다. 이용방법은 하단 설명을 참고해주세요.\n\n * 동물약국 검색은 [동물약국찾기] 버튼을 클릭해주세요. \n* 햄스터,기니피그,토끼,친칠라 등 을 위한 병원은 [소동물찾기] 버튼을 클릭해주세요.  \n* 동물등록방법, 반려동물 분실 및 신고, 로드킬 신고 방법 등은  [FAQ] 버튼을 클릭해주세요. \n* 과태료 관련 정보를 확인 하고 싶으시면 [과태료 정보]를 클릭해주세요. \n* 처음화면으로 돌아가고 싶으면 언제든 [처음]을 입력해주세요. ', 'reply_markup' : keyboard}
         requests.post(url, json=params)
    
     else:
-        params = {'chat_id':chat_id, 'text': ' * 동물약국 검색은 "동물약국찾기" 버튼을 입력해주세요. \n* 햄스터,기니피그,토끼,친칠라 등 을 위한 병원은 "소동물찾기" 버튼을 이용해주세요. ', 'reply_markup' : keyboard}
+        params = {'chat_id':chat_id, 'text': '안녕하세요. '+user_name+'님! '+'\n펫을 위한 모든 정보! 🐹️아이러브펫🐹️입니다. 이용방법은 하단 설명을 참고해주세요.\n\n * 동물약국 검색은 [동물약국찾기] 버튼을 클릭해주세요. \n* 햄스터,기니피그,토끼,친칠라 등 을 위한 병원은 [소동물찾기] 버튼을 클릭해주세요.  \n* 동물등록방법, 반려동물 분실 및 신고, 로드킬 신고 방법 등은  [FAQ] 버튼을 클릭해주세요. \n* 과태료 관련 정보를 확인 하고 싶으시면 [과태료 정보]를 클릭해주세요. \n* 처음화면으로 돌아가고 싶으면 언제든 [처음]을 입력해주세요. ', 'reply_markup' : keyboard}
         requests.post(url, json=params)
 
     
