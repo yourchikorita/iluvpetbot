@@ -275,10 +275,7 @@ def index():
     if request.method == 'POST':
         message = request.get_json()           
         chat_id, msg, user_name, inline_data = parse_message(message)
-        send_message(chat_id, msg, user_name, inline_data)
-        
-       
-            
+        send_message(chat_id, msg, user_name, inline_data)                       
         return Response('ok', status=200)
     else:
         return 'Hello World!'

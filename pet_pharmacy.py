@@ -14,7 +14,7 @@ def pet_pharm_api(userLoc):
     userLoc : userLocation (도봉구)
     '''
     serviceKey='587a69416c736565313032584762564d'
-    endpoint ='http://openapi.seoul.go.kr:8088/{}/json/animalPharmacyInfo/1/800'.format(serviceKey)
+    endpoint ='http://openapi.seoul.go.kr:8088/{}/json/animalPharmacyInfo/1/980'.format(serviceKey)
     resp=requests.get(endpoint)
     data = resp.json()
     pharm_data=data['animalPharmacyInfo']['row']
