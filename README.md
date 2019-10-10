@@ -4,9 +4,10 @@
 
 # Requirements
 * Google Maps URL scheme
-* 서울열린데이터광장-동물약국
-* 리얼소동물 APP
+* 서울열린데이터광장-동물약국API
+* 리얼소동물 APP data
 * 정책공감블로그 데이타
+* heroku or ngrok
 
 # Features
 주요기능<br />
