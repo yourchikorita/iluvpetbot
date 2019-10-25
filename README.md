@@ -1,10 +1,13 @@
-<a href='https://www.python.org/downloads/release/python-370/'><img src=https://img.shields.io/badge/python-3.7-blue></a>
-<a href='https://pypi.org/project/Flask/'><img src=https://img.shields.io/badge/flask-1.1.1-orange></a>
-
 
 # Introduction
 ### 반려동물에 대한 정보를 알려주는 텔레그램봇. @iluvpet <br />
 <2019 서울시 인공지능 챗봇톤><br />
+<p style="text-align: center;">
+<img width="200px" src="./introimg_1.jpg">
+<img width="200px" src="./introimg_2.jpg">
+
+</p>
+<br/>
 
 # Requirements
 * Google Maps URL scheme
