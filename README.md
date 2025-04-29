@@ -1,4 +1,5 @@
 <a href="https://www.python.org/downloads/release/python-370/"><img src='https://img.shields.io/badge/python-3.7-blue'></a>
+https://www.donga.com/news/Society/article/all/20191016/97895354/1
 <img src="https://static.wixstatic.com/media/44b6f1_6f068186e4094563a3fc05a6bd51b9f4~mv2_d_4016_1878_s_2.jpeg/v1/fill/w_925,h_433,al_c,q_90,usm_0.66_1.00_0.01/44b6f1_6f068186e4094563a3fc05a6bd51b9f4~mv2_d_4016_1878_s_2.webp" > </img>
 # Introduction
 ### 반려동물에 대한 정보를 알려주는 텔레그램봇. @iluvpet <br />
